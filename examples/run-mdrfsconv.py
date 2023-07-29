@@ -1,0 +1,72 @@
+#! python
+
+"""
+usage: run-mdrfsconv.py N [ d|s [ GPU|CPU ]]
+  N = cube size, N >= 16
+  d  = double, s = single precision   (default: double precision)
+                                    
+  (GPU is default target unless none exists or no CuPy)                     
+                                    
+Three-dimensional real free-space convolution
+"""
+
+import sys
+from spiralpy.mdrfsconvsolver import *
+import numpy as np
+try:
+    import cupy as cp
+except ModuleNotFoundError:
+    cp = None
+
+import sys
+
+def usage():
+    print(__doc__.strip())
+    sys.exit()
+
+try:
+    N = int(sys.argv[1])
+except:
+    usage()
+    
+if N < 16:
+    usage()
+
+c_type = 'double'
+src_type = np.double
+if len(sys.argv) > 2:
+    if sys.argv[2] == "s":
+        c_type = 'float'
+        src_type = np.single
+
+if len ( sys.argv ) > 3:
+    plat_arg = sys.argv[3]
+else:
+    plat_arg = 'GPU'
+
+if plat_arg == 'GPU' and (cp != None):
+    platform = SP_HIP if sp.has_ROCm() else SP_CUDA
+    forGPU = True
+    xp = cp
+else:
+    platform = SP_CPU
+    forGPU = False 
+    xp = np
+
+opts = {SP_OPT_REALCTYPE : c_type, SP_OPT_PLATFORM : platform}
+
+xp = np
+if forGPU:
+    xp = cp
+
+p1 = MdrfsconvProblem(N)
+s1 = MdrfsconvSolver(p1, opts)
+
+(testIn, symbol) = s1.buildTestInput()
+
+dstP = s1.runDef(testIn, symbol)
+dstC = s1.solve(testIn, symbol)
+
+diff = xp.max(xp.absolute(dstC - dstP))
+msg = ' ' if diff < 1e-7 else ' NOT '
+print ( f'Python/C transforms are{msg}equivalent, diff = {diff}' )
