@@ -24,12 +24,16 @@ def get_version(rel_path):
     else:
         raise RuntimeError("Unable to find version string.")
 
-def find_example_files():
+def find_data_files():
     examples_dir = 'examples'
     example_files = glob.glob(os.path.join(examples_dir, '*.py'))
     example_files = example_files + glob.glob(os.path.join(examples_dir, 'test-many.sh'))
-    example_files = example_files + glob.glob(os.path.join(examples_dir, '../README.md'))
-    return [('share/spiralpy/examples', example_files)]
+
+    misc_dir = '.'
+    misc_files = glob.glob(os.path.join(misc_dir, 'Contributing.md'))
+    misc_files = misc_files + glob.glob(os.path.join(misc_dir, 'README.md'))
+
+    return [('share/spiralpy/examples', example_files)] + [('share/spiralpy', misc_files)]
 
 setup(
     name="spiralpy",
@@ -46,5 +50,5 @@ setup(
     python_requires=">=3.7",
     packages=find_packages(),
     include_package_data=True,
-    data_files=find_example_files(),
+    data_files=find_data_files(),
 )
