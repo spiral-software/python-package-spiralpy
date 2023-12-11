@@ -1,7 +1,12 @@
 #! /bin/bash
 
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-spiralpy/blob/main/LICENSE)
+
 ##  Run examples of the run-xxxx.py scripts
-##  These may use pre-libraries (when appropriate transforms and sizes have been
+##  These may use pre-built libraries (when appropriate transforms and sizes have been
 ##  pre-built; ensure SP_LIBRARY_PATH is set to point to the library directory)
 
 ##  run-batchdft.py examples

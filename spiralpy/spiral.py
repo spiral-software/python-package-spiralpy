@@ -1,3 +1,10 @@
+# spiralpy/spiral.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-spiralpy/blob/main/LICENSE)
+
 
 import sys
 import subprocess
