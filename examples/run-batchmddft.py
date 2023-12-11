@@ -1,4 +1,11 @@
 #! python
+# examples/run-batchmddft.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-spiralpy/blob/main/LICENSE)
+
 
 """
 usage: run-batchmddft.py sz bat [ F|I [ d|s [ GPU|CPU ]]]
