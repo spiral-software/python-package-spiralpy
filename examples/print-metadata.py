@@ -1,3 +1,10 @@
+# examples/print-metadata.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-spiralpy/blob/main/LICENSE)
+
 """
 Print meta data in shared library files in spiralpy .libs directory 
 and in directories specified in SP_LIBRARY_PATH

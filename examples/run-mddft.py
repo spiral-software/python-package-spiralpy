@@ -1,4 +1,11 @@
 #! python
+# examples/run-mddft.py
+#
+# Copyright 2018-2023, Carnegie Mellon University
+# All rights reserved.
+#
+# See LICENSE (https://github.com/spiral-software/python-package-spiralpy/blob/main/LICENSE)
+
 
 """
 usage: run-mddft.py sz [ F|I [ d|s [ GPU|CPU [Fortran]]]
