@@ -342,8 +342,10 @@ class SPSolver:
         xp = sp.get_array_module(x)
         ret = xp.fft.rfftn(x) # executes z, then y, then x
         if self._tracingOn:
-            N = x.shape[0]
-            nnn = '[' + str(N) + ',' + str(N) + ',' + str(N) + ']'
+            n1 = x.shape[0]
+            n2 = x.shape[1]
+            n3 = x.shape[2]
+            nnn = '[' + str(n1) + ',' + str(n2) + ',' + str(n3) + ']'
             st = 'MDPRDFT(' + nnn + ', -1)'
             self._callGraph.insert(0, st)
         return ret
@@ -363,8 +365,10 @@ class SPSolver:
         xp = sp.get_array_module(x)
         ret = xp.fft.irfftn(x, s=shape) # executes x, then y, then z
         if self._tracingOn:
-            N = x.shape[0]
-            nnn = '[' + str(N) + ',' + str(N) + ',' + str(N) + ']'
+            n1 = shape[0]
+            n2 = shape[1]
+            n3 = shape[2]
+            nnn = '[' + str(n1) + ',' + str(n2) + ',' + str(n3) + ']'
             st = 'IMDPRDFT(' + nnn + ', 1)'
             self._callGraph.insert(0, st)
         return ret

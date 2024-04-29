@@ -84,11 +84,13 @@ class MdrconvSolver(SPSolver):
             Nx = (N // 2) + 1
             sym = xp.ascontiguousarray(sym[:, :, :Nx])
                 
-        N = self._problem.dimN()        
+        n1 = self._problem.dimensions()[0]
+        n2 = self._problem.dimensions()[1]
+        n3 = self._problem.dimensions()[2]
         if type(dst) == type(None):
-            dst = xp.zeros((N,N,N), src.dtype)
+            dst = xp.zeros((n1,n2,n3), src.dtype)
         self._func(dst, src, sym)
-        xp.divide(dst, N**3, out=dst)
+        xp.divide(dst, n1*n2*n3, out=dst)
         return dst
  
     def _func(self, dst, src, sym):
@@ -165,11 +167,13 @@ class MdrconvSolver(SPSolver):
         """ Build test input cube """
         
         xp = cp if self._genCuda or self._genHIP else np
-        n = self._problem.dimN()
+        n1 = self._problem.dimensions()[0]
+        n2 = self._problem.dimensions()[1]
+        n3 = self._problem.dimensions()[2]
         
-        testSrc = xp.random.rand(n,n,n).astype(self._ftype)
+        testSrc = xp.random.rand(n1,n2,n3).astype(self._ftype)
         
-        symIn = xp.random.rand(n,n,n).astype(self._ftype)
+        symIn = xp.random.rand(n1,n2,n3).astype(self._ftype)
         testSym = xp.fft.rfftn(symIn)
         
         #NumPy returns Fortran ordering from FFTs, and always double complex
