@@ -1,11 +1,10 @@
 #! python
 
 """
-usage: run-mdrfsconv.py N [ d|s [ GPU|CPU ]]
-  N = cube size, N >= 16
-  d  = double, s = single precision   (default: double precision)
-                                    
-  (GPU is default target unless none exists or no CuPy)                     
+usage: run-mdrfsconv.py sz [ d|s [ GPU|CPU ]]
+    sz is N or N1,N2,N3 all N >= 4, single N implies 3D cube
+    d  = double, s = single precision   (default: double precision)
+    (GPU is default target unless none exists or no CuPy)                 
                                     
 Three-dimensional real free-space convolution
 """
@@ -24,12 +23,17 @@ def usage():
     print(__doc__.strip())
     sys.exit()
 
+##  array dimensions
 try:
-    N = int(sys.argv[1])
+    nnn = sys.argv[1].split(',')
+    n1 = int(nnn[0])
+    n2 = (lambda:n1, lambda:int(nnn[1]))[len(nnn) > 1]()
+    n3 = (lambda:n2, lambda:int(nnn[2]))[len(nnn) > 2]()
+    dims = [n1,n2,n3]
 except:
     usage()
-    
-if N < 16:
+
+if any(n < 4 for n in dims):
     usage()
 
 c_type = 'double'
@@ -59,7 +63,7 @@ xp = np
 if forGPU:
     xp = cp
 
-p1 = MdrfsconvProblem(N)
+p1 = MdrfsconvProblem(dims)
 s1 = MdrfsconvSolver(p1, opts)
 
 (testIn, symbol) = s1.buildTestInput()

@@ -83,7 +83,7 @@ class HockneySolver(SPSolver):
         FFT = self.rfftn(In)            # execute real forward dft on rank 3 data 
         P = self.pointwise(FFT, self._symbol) # execute pointwise operation
         IFFT = self.irfftn(P, shape=In.shape)  # execute real backward dft on rank 3 data
-        D = self.extract(IFFT, N, Nd)   # extract data from corner cube
+        D = self.extract(IFFT, ((N, Nd),))   # extract data from corner cube
         return D
     
     def solve(self, src, dst=None):

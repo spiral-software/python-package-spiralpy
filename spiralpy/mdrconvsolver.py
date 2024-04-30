@@ -23,7 +23,7 @@ class MdrconvProblem(SPProblem):
         """Setup problem specifics for Mdrconv solver.
         
         Arguments:
-        ns      -- shape (tuple) of MDRCONV box of reals
+        ns      -- shape (list) of MDRCONV box of reals
         """
         super(MdrconvProblem, self).__init__(ns)
 
@@ -44,7 +44,6 @@ class MdrconvSolver(SPSolver):
             self._ftype = np.single
             self._cxtype = np.csingle
         
-        ##  n = str(problem.dimN())
         ns = 'x'.join([str(n) for n in problem.dimensions()])
         namebase = typ + 'Mdrconv_' + ns
 
