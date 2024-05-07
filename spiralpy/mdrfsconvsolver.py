@@ -20,16 +20,13 @@ except ModuleNotFoundError:
 class MdrfsconvProblem(SPProblem):
     """Define Mdrfsconv problem."""
 
-    def __init__(self, n):
+    def __init__(self, ns):
         """Setup problem specifics for Mdrfsconv solver.
         
         Arguments:
-        n      -- dimension of input/output cube
+        ns      -- shape (list) of MDRCONV box of reals
         """
-        super(MdrfsconvProblem, self).__init__([n,n,n])
-
-    def dimN(self):
-        return self.dimensions()[0]
+        super(MdrfsconvProblem, self).__init__(ns)
 
 
 class MdrfsconvSolver(SPSolver):
@@ -45,7 +42,6 @@ class MdrfsconvSolver(SPSolver):
             self._ftype = np.single
             self._cxtype = np.csingle
         
-        n = str(problem.dimN())
         ns = 'x'.join([str(n) for n in problem.dimensions()])
         namebase = typ + 'Mdrfsconv_' + ns
             
@@ -68,16 +64,24 @@ class MdrfsconvSolver(SPSolver):
         """Solve using internal Python definition."""
 
         # Mdrfsconv problem dimensions
-        N = self._problem.dimN() * 2
-        Ns = self._problem.dimN()
-        Nd = self._problem.dimN()
+        dims = self._problem.dimensions()
+        Nd1 = dims[0]
+        Nd2 = dims[1]
+        Nd3 = dims[2]
+        Ns1 = Nd1
+        Ns2 = Nd2
+        Ns3 = Nd3
+        N1 = Nd1 * 2
+        N2 = Nd2 * 2
+        N3 = Nd3 * 2
         
+    
         # Mdrfsconv operations
-        In = self.zeroEmbedBox(src, ((Ns,0),)) # zero pad input data 
+        In = self.zeroEmbedBox(src, ((Ns1,0),(Ns2,0),(Ns3,0))) # zero pad input data 
         FFT = self.rfftn(In)            # execute real forward dft on rank 3 data      
         P = self.pointwise(FFT, sym) # execute pointwise operation
         IFFT = self.irfftn(P, shape=In.shape)  # execute real backward dft on rank 3 data
-        return self.extract(IFFT, N, Nd)   # extract data from corner cube
+        return self.extract(IFFT, ((N1, Nd1),(N2, Nd2),(N3, Nd3)))   # extract data from corner cube
     
     def solve(self, src, sym, dst=None):
         """Call SPIRAL-generated code"""
@@ -90,12 +94,15 @@ class MdrfsconvSolver(SPSolver):
             N = shape[0]
             Nx = (N // 2) + 1
             sym = xp.ascontiguousarray(sym[:, :, :Nx])
-                
-        N = self._problem.dimN()        
+        
+        dims = self._problem.dimensions()
+        n1 = dims[0]
+        n2 = dims[1]      
+        n3 = dims[2]            
         if type(dst) == type(None):
-            dst = xp.zeros((N,N,N), src.dtype)
+            dst = xp.zeros((n1,n2,n3), src.dtype)
         self._func(dst, src, sym)
-        xp.divide(dst, (2*N)**3, out=dst)
+        xp.divide(dst, n1*n2*n3*8, out=dst)
         return dst
  
     def _func(self, dst, src, sym):
@@ -172,11 +179,14 @@ class MdrfsconvSolver(SPSolver):
         """ Build test input cube """
         
         xp = cp if self._genCuda or self._genHIP else np
-        n = self._problem.dimN()
+        dims = self._problem.dimensions()
+        n1 = dims[0]
+        n2 = dims[1]
+        n3 = dims[2]
         
-        testSrc = xp.random.rand(n,n,n).astype(self._ftype)
+        testSrc = xp.random.rand(n1,n2,n3).astype(self._ftype)
         
-        symIn = xp.random.rand(n*2,n*2,n*2).astype(self._ftype)
+        symIn = xp.random.rand(n1*2,n2*2,n3*2).astype(self._ftype)
         testSym = xp.fft.rfftn(symIn)
         
         #NumPy returns Fortran ordering from FFTs, and always double complex
