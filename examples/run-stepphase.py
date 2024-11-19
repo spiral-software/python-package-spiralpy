@@ -57,12 +57,11 @@ else:
 
 dims = [N,N,N]
 
-src = np.ones(dims, dtype=src_type)
-for  k in range (np.size(src)):
-    src.itemset(k,np.random.random()*10.0)
-
-if forGPU:
-    src = cp.asarray(src) 
+src = xp.ones(dims, dtype=src_type)
+for i in range(dims[0]):
+    for j in range(dims[1]):
+        for k in range(dims[2]):
+            src[i,j,k] = np.random.random()*10.0
 
 opts = { SP_OPT_REALCTYPE : c_type, SP_OPT_PLATFORM : platform }
 

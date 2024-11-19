@@ -86,25 +86,28 @@ if order == 'F':
 p1 = MdprdftProblem(dims, k)
 s1 = MdprdftSolver(p1, opts)
 
+xp = np    
+if forGPU:
+    xp = cp
+
 if k == SP_FORWARD:
     # build full-size array of real
-    src = np.ones(dims, ftype, order)
-    for  k in range (np.size(src)):
-        vr = np.random.random()
-        src.itemset(k,vr)
+    src = xp.ones(tuple(dims), ftype)
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            for k in range(dims[2]):
+                vr = np.random.random()
+                src[i,j,k] = vr
 else:
     # build half-size array of complex
     dims2 = s1.dimensionsCX()
-    src = np.ones(dims2, cxtype, order)
-    for  k in range (np.size(src)):
-        vr = np.random.random()
-        vi = np.random.random()
-        src.itemset(k,vr + vi * 1j)
-
-xp = np
-if forGPU:    
-    src = cp.asarray(src)
-    xp = cp
+    src = xp.ones(tuple(dims2), cxtype)
+    for i in range(dims2[0]):
+        for j in range(dims2[1]):
+            for k in range(dims2[2]):
+                vr = np.random.random()
+                vi = np.random.random()
+                src[i,j,k] = vr + vi * 1j
 
 dstP = s1.runDef(src)
 dstC = s1.solve(src)
