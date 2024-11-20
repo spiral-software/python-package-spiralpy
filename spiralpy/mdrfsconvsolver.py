@@ -26,7 +26,16 @@ class MdrfsconvProblem(SPProblem):
         Arguments:
         ns      -- shape (list) of MDRCONV box of reals
         """
-        super(MdrfsconvProblem, self).__init__(ns)
+        
+        if type(ns) is list:
+            dims = ns
+        elif type(ns) is int:
+            dims = [ns,ns,ns]
+        else:
+            raise RuntimeError('MdrfsconvProblem dimensions must be a list or int')
+        
+        
+        super(MdrfsconvProblem, self).__init__(dims)
 
 
 class MdrfsconvSolver(SPSolver):
@@ -88,17 +97,18 @@ class MdrfsconvSolver(SPSolver):
         
         xp = sp.get_array_module(src)
         
-        #slice sym if it's a cube
-        shape = sym.shape
-        if shape[0] == shape[2]:
-            N = shape[0]
-            Nx = (N // 2) + 1
-            sym = xp.ascontiguousarray(sym[:, :, :Nx])
-        
         dims = self._problem.dimensions()
         n1 = dims[0]
         n2 = dims[1]      
-        n3 = dims[2]            
+        n3 = dims[2]
+        
+        #slice sym if it's full size
+        shape = sym.shape
+        if shape[2] == 2*n3:
+            N = shape[2]
+            Nx = (N // 2) + 1
+            sym = xp.ascontiguousarray(sym[:, :, :Nx])
+        
         if type(dst) == type(None):
             dst = xp.zeros((n1,n2,n3), src.dtype)
         self._func(dst, src, sym)
