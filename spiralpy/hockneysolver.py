@@ -171,7 +171,7 @@ class HockneySolver(SPSolver):
         ns = self._problem.dimNS()
 		
         ret = np.array([[[(i*ns**2+1)+(j*ns)+(k) for i in range(ns)]for j in range(ns)] \
-			for k in range(ns)]).astype(np.float)
+			for k in range(ns)]).astype(float)
 
         return ret
      
