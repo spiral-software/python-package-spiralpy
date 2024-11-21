@@ -80,10 +80,14 @@ class BatchMddftSolver(SPSolver):
             cxtype = np.cdouble
                
         src = np.ones(dimsTuple, cxtype)
-        for  k in range (np.size(src)):
-            vr = np.random.random()
-            vi = np.random.random()
-            src.itemset(k,vr + vi * 1j)
+        for bi in range(b):
+            for i in range(dims[0]):
+                for j in range(dims[1]):
+                    for k in range(dims[2]):
+                        vr = np.random.random()
+                        vi = np.random.random()
+                        src[bi,i,j,k] = vr + vi * 1j
+        
         if self._genCuda or self._genHIP:    
             src = cp.asarray(src)
         
