@@ -349,8 +349,10 @@ class SPSolver:
         xp = sp.get_array_module(x)
         ret = xp.fft.rfftn(x) # executes z, then y, then x
         if self._tracingOn:
-            N = x.shape[0]
-            nnn = '[' + str(N) + ',' + str(N) + ',' + str(N) + ']'
+            n1 = x.shape[0]
+            n2 = x.shape[1]
+            n3 = x.shape[2]
+            nnn = '[' + str(n1) + ',' + str(n2) + ',' + str(n3) + ']'
             st = 'MDPRDFT(' + nnn + ', -1)'
             self._callGraph.insert(0, st)
         return ret
@@ -370,19 +372,34 @@ class SPSolver:
         xp = sp.get_array_module(x)
         ret = xp.fft.irfftn(x, s=shape) # executes x, then y, then z
         if self._tracingOn:
-            N = x.shape[0]
-            nnn = '[' + str(N) + ',' + str(N) + ',' + str(N) + ']'
+            n1 = shape[0]
+            n2 = shape[1]
+            n3 = shape[2]
+            nnn = '[' + str(n1) + ',' + str(n2) + ',' + str(n3) + ']'
             st = 'IMDPRDFT(' + nnn + ', 1)'
             self._callGraph.insert(0, st)
         return ret
 
-    def extract(self, x, N, Nd):
-        """ Extract output data of dimension (Nd, Nd, Nd) from the corner of cube (N, N ,N) """
-        ret = x[N-Nd:N, N-Nd:N, N-Nd:N]
+    def extract(self, x, ranges):
+        """ Extract output data of dimension (Nd1, Nd2, Nd3) from the corner of cube (N1, N2 ,N3) """
+        
+        r1 = ranges[0]
+        r2 = ranges[1] if len(ranges) > 1 else r1
+        r3 = ranges[2] if len(ranges) > 2 else r2
+        N1 = r1[0]
+        Nd1 = r1[1]
+        N2 = r2[0]
+        Nd2 = r2[1]
+        N3 = r3[0]
+        Nd3 = r3[1]
+        
+        ret = x[N1-Nd1:N1, N2-Nd2:N2, N3-Nd3:N3]
         if self._tracingOn:
-            nnn = '[' + str(N) + ',' + str(N) + ',' + str(N) + ']'
-            ndrange = '[' + str(N-Nd) + '..' + str(N-1) + ']'
-            ndr3D = '[' + ndrange + ',' + ndrange + ',' + ndrange + ']'
+            nnn = '[' + str(N1) + ',' + str(N2) + ',' + str(N3) + ']'
+            ndrange1 = '[' + str(N1-Nd1) + '..' + str(N1-1) + ']'
+            ndrange2 = '[' + str(N2-Nd2) + '..' + str(N2-1) + ']'
+            ndrange3 = '[' + str(N3-Nd3) + '..' + str(N3-1) + ']'
+            ndr3D = '[' + ndrange1 + ',' + ndrange2 + ',' + ndrange3 + ']'
             st = 'ExtractBox(' + nnn + ', ' + ndr3D + ')'
             self._callGraph.insert(0, st)
         return ret

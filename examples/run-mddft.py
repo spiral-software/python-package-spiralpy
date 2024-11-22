@@ -87,16 +87,18 @@ if order == 'F':
 p1 = MddftProblem(dims, k)
 s1 = MddftSolver(p1, opts)
 
-src = np.ones(dims, cxtype, order)
-for  x in range (np.size(src)):
-    vr = np.random.random()
-    vi = np.random.random()
-    src.itemset(x,vr + vi * 1j)
-
-xp = np
-if forGPU:    
-    src = cp.asarray(src)
+xp = np  
+if forGPU:
     xp = cp
+
+# init input
+src = xp.zeros(dims, cxtype, order)
+for i in range(dims[0]):
+    for j in range(dims[1]):
+        for k in range(dims[2]):
+            vr = np.random.random()
+            vi = np.random.random()
+            src[i,j,k] = vr + vi * 1j
 
 dstP = s1.runDef(src)
 dstC = s1.solve(src)
